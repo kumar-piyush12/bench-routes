@@ -16,4 +16,4 @@ test:
 run:
 	echo "compiling go-code and executing bench-routes"
 	echo "using 9990 as default service listener port"
-	go run src/*.go 9990
+	go run src/main.go 9990

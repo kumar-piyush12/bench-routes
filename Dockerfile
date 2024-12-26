@@ -1,16 +1,20 @@
-FROM centos:centos8
-RUN yum -y upgrade
-RUN yum install -y net-tools nodejs npm golang
-RUN node --version
-RUN npm --version
-WORKDIR $GOPATH/src/github.com/bench-routes/bench-routes
-COPY . $GOPATH/src/github.com/bench-routes/bench-routes
-RUN cd $GOPATH/src/github.com/bench-routes/bench-routes/src && go get -v ./...
-RUN go build $GOPATH/src/github.com/bench-routes/bench-routes/src/main.go
-RUN mv main bench-routes
-RUN npm install -g yarn
-RUN cd dashboard/v1.1/ && yarn install && yarn run build
-RUN rm -R ui-builds/v1.1
-RUN cp -r dashboard/v1.1/build ui-builds/v1.1
-EXPOSE 9990
-CMD [ "./bench-routes" ]
+# Use Node.js base image
+FROM node:18.20.5-alpine
+
+# Set the working directory in the container
+WORKDIR /usr/src/app
+
+# Copy the package.json and package-lock.json (or just package.json if the lock file is missing)
+COPY package.json ./
+COPY package-lock.json ./  
+# Install backend dependencies
+RUN npm install
+
+# Copy the rest of the backend application code
+COPY . .
+
+# Expose the port the backend is running on
+EXPOSE 5000
+
+# Start the backend service
+CMD ["npm", "start"]
